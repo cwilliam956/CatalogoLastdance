@@ -1,52 +1,109 @@
-# techfinance
-## Descrição
+📝 Descrição
+O LastDance é um aplicativo de catálogo de produtos desenvolvido com React Native e Expo, integrado com serviços AWS para armazenamento, processamento e segurança. O projeto demonstra a utilização de 4 tecnologias AWS essenciais:
 
-O **techfinance** é uma aplicação desenvolvida para gerenciar produtos, vendas, clientes e gerar relatórios detalhados sobre essas áreas. A aplicação inclui funcionalidades como visualização de detalhes de produtos e clientes, insights sobre vendas e produtos, e um assistente virtual chamado Dinho Bot.
+Amazon S3 - Armazenamento de imagens dos produtos
 
-## Funcionalidades
+Amazon DynamoDB - Banco de dados para informações dos produtos
 
-- **Gerenciamento de Produtos**: Adicione, edite e visualize produtos.
-- **Gerenciamento de Vendas**: Acompanhe e filtre vendas por data.
-- **Gerenciamento de Clientes**: Adicione, edite e visualize clientes.
-- **Relatórios**: Geração de relatórios detalhados sobre vendas, produtos e clientes.
-- **Assistente Virtual**: Interaja com o Dinho Bot para obter insights e ajuda.
+AWS IAM - Gerenciamento seguro de acessos e permissões
 
-## Tecnologias Utilizadas
+Amazon CloudFront - Distribuição global do conteúdo estático
 
-- **React Native**: Para desenvolvimento da interface mobile.
-- **Expo**: Para simplificar o desenvolvimento e a execução do aplicativo.
-- **TypeScript**: Para tipagem estática e melhor manutenção do código.
-- **NativeWind**: Para estilização dos componentes.
-- **React Navigation**: Para navegação entre telas.
-- **React Native Reanimated**: Para animações fluidas.
-- **Expo Image Picker**: Para seleção de imagens na galeria.
+✨ Funcionalidades
+📱 Catálogo de produtos em lista vertical
 
-## Estrutura do Projeto
+🖼️ Visualização de imagens em alta qualidade
 
-- **src/app**: Contém as telas principais da aplicação.
-- **src/components**: Contém componentes reutilizáveis.
-- **src/models**: Contém definições de tipos e modelos de dados.
-- **src/repositories**: Contém a lógica de acesso a dados.
+🔍 Busca e filtragem de produtos por categoria
 
-## Como Executar
+🔐 Autenticação segura de usuários
 
-1. Clone o repositório:
-    ```sh
-    git clone https://github.com/seu-usuario/techfinance.git
-    ```
-2. Navegue até o diretório do projeto:
-    ```sh
-    cd techfinance
-    ```
-3. Instale as dependências:
-    ```sh
-    npm install
-    ```
-4. Execute o projeto:
-    ```sh
-    expo start
-    ```
+✏️ CRUD completo de produtos (Create, Read, Update, Delete)
 
-## Contribuição
+⚡ Performance otimizada com cache
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests.
+🛠️ Tecnologias Utilizadas
+Frontend
+React Native
+
+Expo
+
+TypeScript
+
+Tailwind CSS
+
+React Navigation
+
+Backend/Serviços AWS
+Amazon S3 - Armazenamento de imagens
+
+Amazon DynamoDB - Armazenamento de dados dos produtos
+
+AWS IAM - Controle de acesso seguro
+
+Amazon CloudFront - CDN para distribuição de conteúdo
+
+🚀 Como Executar o Projeto
+Pré-requisitos
+Node.js (v18+)
+
+Expo CLI
+
+Conta AWS configurada
+
+Instalação
+Clone o repositório:
+
+bash
+git clone https://github.com/seu-usuario/lastdance-app.git
+cd lastdance-app
+Instale as dependências:
+
+bash
+npm install
+Configure as variáveis de ambiente AWS:
+
+bash
+cp .env.example .env
+Edite o arquivo .env com suas credenciais AWS.
+
+Inicie o aplicativo:
+
+bash
+expo start
+🔧 Configuração AWS
+1. Amazon S3
+Crie um bucket para armazenar imagens dos produtos
+
+Configure as permissões CORS adequadas
+
+2. Amazon DynamoDB
+Crie uma tabela Products com:
+
+Partition Key: id (String)
+
+Sort Key: category (String)
+
+3. AWS IAM
+Crie um usuário IAM com políticas para:
+
+Acesso ao S3 (PutObject, GetObject)
+
+Acesso ao DynamoDB (CRUD)
+
+Utilize credenciais temporárias para maior segurança
+
+4. Amazon CloudFront
+Configure uma distribuição apontando para o bucket S3
+
+Habilite HTTPS e compressão
+
+📦 Estrutura do Projeto
+lastdance-app/
+├── app/                  # Código principal
+├── assets/               # Recursos estáticos
+├── components/           # Componentes reutilizáveis
+├── hooks/                # Lógica customizada
+├── services/             # Integração com AWS
+├── types/                # Tipos TypeScript
+└── utils/                # Funções utilitárias
