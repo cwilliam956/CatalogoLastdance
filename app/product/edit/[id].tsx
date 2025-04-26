@@ -1,86 +1,79 @@
-import { useLocalSearchParams, router } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useProducts } from '@/hooks/useProducts';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function EditProduct() {
   const { id } = useLocalSearchParams();
-  const { products, updateProduct } = useProducts();
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    imageUrl: '',
-    price: '',
-    category: ''
-  });
+  const { products } = useProducts();
+  const [product, setProduct] = useState<{
+    name: string;
+    description: string;
+    imageUrl: string;
+    price: string;
+    category: string;
+  } | null>(null);
 
   useEffect(() => {
-    const product = products.find(p => p.id === id);
-    if (product) {
-      setForm({
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price.toString(),
-        category: product.category
+    const foundProduct = products.find(p => p.id === id);
+    if (foundProduct) {
+      setProduct({
+        name: foundProduct.name,
+        description: foundProduct.description,
+        imageUrl: foundProduct.imageUrl,
+        price: foundProduct.price.toString(),
+        category: foundProduct.category
       });
     }
   }, [id, products]);
 
-  const handleSubmit = () => {
-    updateProduct(id as string, {
-      ...form,
-      price: parseInt(form.price) || 0
-    });
-    router.back();
-  };
+  if (!product) {
+    return (
+      <View style={styles.container}>
+        <Text>Produto não encontrado</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Editar Produto</Text>
-      
+      <Text style={styles.title}>Detalhes do Produto</Text>
+
       <TextInput
         placeholder="Nome do produto"
-        value={form.name}
-        onChangeText={(text) => setForm({...form, name: text})}
+        value={product.name}
+        editable={false}
         style={styles.input}
       />
-      
+
       <TextInput
         placeholder="Descrição"
-        value={form.description}
-        onChangeText={(text) => setForm({...form, description: text})}
+        value={product.description}
+        editable={false}
         style={styles.input}
         multiline
       />
-      
-      <TextInput
-        placeholder="URL da imagem"
-        value={form.imageUrl}
-        onChangeText={(text) => setForm({...form, imageUrl: text})}
-        style={styles.input}
-      />
-      
+
       <TextInput
         placeholder="Preço (em centavos)"
-        value={form.price}
-        onChangeText={(text) => setForm({...form, price: text})}
+        value={product.price}
+        editable={false}
         style={styles.input}
         keyboardType="numeric"
       />
-      
+
       <TextInput
         placeholder="Categoria"
-        value={form.category}
-        onChangeText={(text) => setForm({...form, category: text})}
+        value={product.category}
+        editable={false}
         style={styles.input}
       />
-      
-      <TouchableOpacity 
-        style={styles.submitButton}
-        onPress={handleSubmit}
+
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.back()}
       >
-        <Text style={styles.submitButtonText}>Atualizar Produto</Text>
+        <Text style={styles.backButtonText}>Voltar</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -104,16 +97,16 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  submitButton: {
+  backButton: {
     backgroundColor: '#2563eb',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
   },
-  submitButtonText: {
+  backButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,

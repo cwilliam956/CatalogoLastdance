@@ -18,27 +18,40 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     ios: {
         supportsTablet: true,
-        bundleIdentifier: "com.techfinance.app"
+        bundleIdentifier: "com.techfinance.app",
+        infoPlist: {
+            NSPhotoLibraryUsageDescription: "Allow $(PRODUCT_NAME) to access your photos to upload product images.",
+            NSCameraUsageDescription: "Allow $(PRODUCT_NAME) to access your camera to take product photos."
+        }
     },
     android: {
         adaptiveIcon: {
             foregroundImage: "./assets/adaptive-icon.png",
             backgroundColor: "#ffffff"
         },
-        package: "br.com.techfinance.app"
+        package: "br.com.techfinance.app",
+        permissions: [
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.CAMERA"
+        ]
     },
     web: {
         favicon: "./assets/favicon.png"
     },
     plugins: [
-        "expo-router"
+        "expo-router",
+        [
+            "expo-image-picker",
+            {
+                "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to upload product images.",
+                "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to take product photos."
+            }
+        ]
     ],
     extra: {
         geminiApiKey: process.env.GEMINI_API_KEY,
         supabaseUrl: process.env.SUPABASE_URL,
-        supabaseKey: process.env.SUPABASE_ANON_KEY,
-        eas: {
-            projectId: "b482baa0-eb1e-4501-a7b0-9878a9beb8fa",
-        }
+        supabaseKey: process.env.SUPABASE_ANON_KEY
     },
 });
