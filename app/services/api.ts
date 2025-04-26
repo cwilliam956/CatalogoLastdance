@@ -1,5 +1,6 @@
 import { Product } from "@/types/product";
 import axios, { AxiosError } from "axios";
+import * as FileSystem from 'expo-file-system';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -22,56 +23,69 @@ interface ApiError {
   status?: number;
 }
 
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 export const ProductService = {
   async create(product: CreateProductData): Promise<Product> {
+    if (!product.name || !product.description || !product.price || !product.category || !product.image) {
+      throw new Error('Todos os campos são obrigatórios, incluindo a imagem');
+    }
+
     try {
-      if (!product.name || !product.description || !product.price || !product.category) {
-        throw new Error('Todos os campos são obrigatórios');
+      let base64Image = '';
+
+      if (product.image?.uri) {
+        try {
+          const fileContent = await FileSystem.readAsStringAsync(product.image.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+
+          base64Image = `data:${product.image.type};base64,${fileContent}`;
+          console.log('Image converted to base64 successfully');
+        } catch (error) {
+          console.error('Error converting image to base64:', error);
+          throw new Error('Falha ao processar a imagem. Tente novamente.');
+        }
       }
 
-      const formData = new FormData();
-      formData.append('name', product.name);
-      formData.append('description', product.description);
-      formData.append('price_in_cents', product.price.toString());
-      formData.append('category', product.category);
-
-      if (product.image) {
-        const response = await fetch(product.image.uri);
-        const blob = await response.blob();
-        formData.append('image', blob, product.image.name);
+      if (!base64Image) {
+        throw new Error('Não foi possível processar a imagem');
       }
 
-      const response = await axios.post(`${API_URL}/produtos`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json',
-        },
-      });
+      const productData = {
+        name: product.name,
+        description: product.description,
+        price_in_cents: product.price,
+        category: product.category,
+        image: base64Image
+      };
 
-      if (response.status === 201 && response.data) {
-        const data = response.data;
-        return {
-          id: data.id,
-          name: data.name,
-          description: data.description,
-          price: data.price_in_cents,
-          category: data.category,
-          imageUrl: data.image_url ?? defaultImage
-        };
+      const response = await api.post('/produtos', productData);
+
+      if (response.status !== 201) {
+        throw new Error(response.data?.message ?? 'Erro ao criar o produto');
       }
 
-      throw new Error('Resposta inválida do servidor');
+      const data = response.data;
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        price: data.price_in_cents,
+        category: data.category,
+        imageUrl: data.image_url ?? defaultImage,
+      };
     } catch (error) {
       console.error('Erro ao criar produto:', error);
-
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<ApiError>;
-        const errorMessage = axiosError.response?.data?.message ??
-          axiosError.message ??
-          'Erro ao criar o produto';
-        throw new Error(errorMessage);
+        throw new Error(axiosError.response?.data?.message ?? 'Erro ao criar o produto');
       }
-
       throw error;
     }
   },
@@ -82,7 +96,7 @@ export const ProductService = {
         throw new Error('ID do produto é obrigatório');
       }
 
-      const response = await axios.get(`${API_URL}/produtos/${id}`);
+      const response = await api.get(`/produtos/${id}`);
 
       if (response.status === 200 && response.data) {
         const data = response.data;
@@ -114,7 +128,14 @@ export const ProductService = {
 
   async getAll(): Promise<Product[]> {
     try {
-      const response = await axios.get(`${API_URL}/produtos`);
+      const timestamp = new Date().getTime();
+      const response = await api.get(`/produtos?_=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
 
       if (response.status === 200 && Array.isArray(response.data)) {
         return response.data.map((item: any) => ({
@@ -146,9 +167,7 @@ export const ProductService = {
         throw new Error('ID do produto é obrigatório');
       }
 
-      const response = await axios.put(`${API_URL}/produtos/${id}`, product, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await api.put(`/produtos/${id}`, product);
 
       if (response.status !== 200) {
         throw new Error('Erro ao atualizar o produto');
@@ -171,7 +190,7 @@ export const ProductService = {
         throw new Error('ID do produto é obrigatório');
       }
 
-      const response = await axios.delete(`${API_URL}/produtos/${id}`);
+      const response = await api.delete(`/produtos/${id}`);
 
       if (response.status !== 204) {
         throw new Error('Erro ao deletar o produto');

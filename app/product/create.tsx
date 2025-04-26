@@ -23,9 +23,9 @@ export default function CreateProduct() {
         quality: 1,
       });
 
-      if (!result.canceled) {
+      if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
-        const fileExtension = asset.uri.split('.').pop();
+        const fileExtension = asset.uri.split('.').pop() || 'jpg';
         const fileName = `image_${Date.now()}.${fileExtension}`;
 
         setImage({
@@ -108,7 +108,6 @@ export default function CreateProduct() {
           ) : (
             <View style={styles.imagePickerContent}>
               <Text style={styles.imagePickerText}>Toque para selecionar uma imagem</Text>
-              <Text style={styles.imagePickerSubtext}>(Opcional)</Text>
             </View>
           )}
         </TouchableOpacity>

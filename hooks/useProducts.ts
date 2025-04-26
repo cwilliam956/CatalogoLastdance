@@ -1,6 +1,7 @@
 import { ProductService } from '@/app/services/api';
 import { Product } from '@/types/product';
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
 
 type CreateProductInput = Omit<Product, 'id' | 'imageUrl'> & {
   image?: { uri: string; type: string; name: string };
@@ -14,6 +15,14 @@ export const useProducts = () => {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Screen focused, refreshing products');
+      loadProducts();
+      return () => { };
+    }, [])
+  );
 
   const loadProducts = async () => {
     try {
@@ -35,6 +44,7 @@ export const useProducts = () => {
       const newProduct = await ProductService.create(product);
       setProducts([...products, newProduct]);
       setError(null);
+      return newProduct;
     } catch (err) {
       setError('Failed to create product');
       console.error(err);

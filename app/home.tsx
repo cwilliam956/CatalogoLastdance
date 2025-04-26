@@ -3,11 +3,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProducts } from '@/hooks/useProducts';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const { products } = useProducts();
+  const { products, loading, refresh } = useProducts();
 
   const formatPrice = (cents: number) => {
     return `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`;
@@ -20,6 +20,14 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refresh}
+            colors={['#6751a3']}
+            tintColor="#6751a3"
+          />
+        }
       >
         <View style={styles.headerContainer}>
           {products.length === 0 && (
@@ -50,7 +58,11 @@ export default function HomeScreen() {
               onPress={() => router.push(`/product/${product.id}`)}
             >
               <Image
-                source={{ uri: product.imageUrl }}
+                source={
+                  product.imageUrl
+                    ? { uri: product.imageUrl.replace('localhost', '10.0.2.2') }
+                    : { uri: 'https://via.placeholder.com/150' }
+                }
                 style={styles.productImage}
                 resizeMode="cover"
               />
