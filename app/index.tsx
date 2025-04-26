@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -35,7 +35,7 @@ export default function LoginScreen() {
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
       <StatusBar style="dark" />
       <LinearGradient
-        colors={['#4f46e5', '#6366f1']}
+        colors={['#6366f1', '#6751a3']}
         style={{
           position: 'absolute',
           left: 0,
@@ -59,29 +59,12 @@ export default function LoginScreen() {
           <View style={{
             width: 120,
             height: 120,
-            backgroundColor: 'white',
             borderRadius: 60,
             justifyContent: 'center',
             alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 5,
           }}>
-            <Text style={{ fontSize: 50 }}>💃</Text>
+            <Image source={require('../assets/icon.png')} style={{ width: 120, height: 120, borderRadius: 40 }} />
           </View>
-          <Text style={{
-            fontSize: 32,
-            marginTop: 16,
-            color: 'white',
-            fontWeight: 'bold',
-            textShadowColor: 'rgba(0, 0, 0, 0.2)',
-            textShadowOffset: { width: 0, height: 2 },
-            textShadowRadius: 4,
-          }}>
-            Last Dance
-          </Text>
         </View>
 
         {/* Banner de erro amigável */}
@@ -172,10 +155,10 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={handleLogin}
             style={{
-              backgroundColor: '#4f46e5',
+              backgroundColor: '#6751a3',
               padding: 16,
               borderRadius: 12,
-              shadowColor: '#4f46e5',
+              shadowColor: '#6366f1',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,
@@ -198,7 +181,7 @@ export default function LoginScreen() {
             style={{ marginTop: 16, alignItems: 'center' }}
             activeOpacity={0.7}
           >
-            <Text style={{ color: '#6366f1', fontWeight: 'bold', fontSize: 16 }}>
+            <Text style={{ color: '#6751a3', fontWeight: 'bold', fontSize: 16 }}>
               Esqueceu a senha?
             </Text>
             <Text style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>

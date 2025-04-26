@@ -1,18 +1,15 @@
 import { useAuth } from '@/hooks/useAuth';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-export default function Header({ username }: { username: string }) {
+export default function Header({ username }: Readonly<{ username: string }>) {
   const logout = useAuth((state) => state.logout);
   const navigation = useNavigation();
 
   return (
-    <LinearGradient
-      colors={['#4f46e5', '#6366f1']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
+    <View
       style={{
+        backgroundColor: '#6751a3',
         padding: 16,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -73,6 +70,6 @@ export default function Header({ username }: { username: string }) {
       >
         <Text style={{ color: 'white', fontWeight: '500' }}>Sair</Text>
       </TouchableOpacity>
-    </LinearGradient>
+    </View>
   );
 }

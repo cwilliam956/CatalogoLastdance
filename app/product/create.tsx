@@ -1,6 +1,5 @@
 import { useProducts } from '@/hooks/useProducts';
 import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -26,10 +25,13 @@ export default function CreateProduct() {
 
       if (!result.canceled) {
         const asset = result.assets[0];
+        const fileExtension = asset.uri.split('.').pop();
+        const fileName = `image_${Date.now()}.${fileExtension}`;
+
         setImage({
           uri: asset.uri,
-          type: 'image/jpeg',
-          name: 'image.jpg'
+          type: `image/${fileExtension}`,
+          name: fileName
         });
       }
     } catch (error) {
@@ -39,16 +41,13 @@ export default function CreateProduct() {
   };
 
   const formatPrice = (value: string) => {
-    // Remove tudo que não é número ou ponto decimal
     const numericValue = value.replace(/[^\d.]/g, '');
 
-    // Garante que só tem um ponto decimal
     const parts = numericValue.split('.');
     if (parts.length > 2) {
       return parts[0] + '.' + parts.slice(1).join('');
     }
 
-    // Limita a 2 casas decimais
     if (parts[1] && parts[1].length > 2) {
       return parts[0] + '.' + parts[1].slice(0, 2);
     }
@@ -62,19 +61,28 @@ export default function CreateProduct() {
       return;
     }
 
+    if (!image) {
+      Alert.alert('Erro', 'Por favor, selecione uma imagem para o produto');
+      return;
+    }
+
     try {
-      // Converte o preço de decimal para centavos
       const priceInCents = Math.round(parseFloat(form.price) * 100);
 
       await addProduct({
         ...form,
         price: priceInCents,
-        image: image || undefined
+        image: image
       });
       router.back();
     } catch (error) {
       console.error('Error creating product:', error);
-      Alert.alert('Erro', 'Não foi possível criar o produto. Verifique sua conexão com a internet.');
+      Alert.alert(
+        'Erro',
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível criar o produto. Verifique sua conexão com a internet.'
+      );
     }
   };
 
@@ -83,12 +91,11 @@ export default function CreateProduct() {
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     >
-      <LinearGradient
-        colors={['#4f46e5', '#6366f1']}
+      <View
         style={styles.header}
       >
         <Text style={styles.title}>Adicionar Novo Produto</Text>
-      </LinearGradient>
+      </View>
 
       <View style={styles.content}>
         <TouchableOpacity
@@ -173,6 +180,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    backgroundColor: '#6751a3',
   },
   title: {
     fontSize: 24,
@@ -234,12 +242,12 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   submitButton: {
-    backgroundColor: '#4f46e5',
+    backgroundColor: '#6751a3',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 20,
-    shadowColor: '#4f46e5',
+    shadowColor: '#6751a3',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -252,5 +260,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+    textAlign: 'center',
   },
 });

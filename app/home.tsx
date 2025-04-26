@@ -15,27 +15,30 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Header username={user?.name || ''} />
+      <Header username={user?.name ?? ''} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerContainer}>
-          <Text style={styles.title}>Catálogo LastDance</Text>
+          {products.length === 0 && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Nenhum produto cadastrado até o momento</Text>
+            </View>
+          )}
+
+          {products.length > 0 && (
+            <Text style={styles.title}>Últimos produtos</Text>
+          )}
 
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => router.push('/product/create')}
           >
-            <LinearGradient
-              colors={['#4f46e5', '#6366f1']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.gradientButton}
-            >
+            <View style={styles.gradientButton}>
               <Text style={styles.addButtonText}>+ Adicionar Produto</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -86,6 +89,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#1e293b',
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#1e293b',
   },
   addButton: {
     borderRadius: 12,
@@ -95,6 +107,7 @@ const styles = StyleSheet.create({
   gradientButton: {
     padding: 16,
     alignItems: 'center',
+    backgroundColor: '#6751a3',
   },
   addButtonText: {
     color: 'white',
