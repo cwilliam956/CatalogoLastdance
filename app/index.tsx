@@ -1,21 +1,33 @@
 import { useAuth } from '@/hooks/useAuth';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
   const login = useAuth((state) => state.login);
 
   const handleLogin = async () => {
+    setLoginError(null);
     const success = await login(email, password);
     if (success) {
       router.replace('/home');
     } else {
-      Alert.alert('Erro', 'Credenciais inválidas');
+      setLoginError('E-mail ou senha inválidos. Tente novamente.');
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setLoginError(null);
+    const success = await login('admin', 'admin');
+    if (success) {
+      router.replace('/home');
+    } else {
+      setLoginError('Não foi possível acessar a conta de demonstração.');
     }
   };
 
@@ -71,6 +83,20 @@ export default function LoginScreen() {
             Last Dance
           </Text>
         </View>
+
+        {/* Banner de erro amigável */}
+        {loginError && (
+          <View style={{
+            backgroundColor: '#fee2e2',
+            borderRadius: 10,
+            padding: 16,
+            marginBottom: 16,
+            borderWidth: 1,
+            borderColor: '#fca5a5',
+          }}>
+            <Text style={{ color: '#b91c1c', textAlign: 'center', fontWeight: 'bold' }}>{loginError}</Text>
+          </View>
+        )}
 
         <View style={{
           backgroundColor: 'white',
@@ -163,6 +189,20 @@ export default function LoginScreen() {
               fontWeight: 'bold',
             }}>
               Entrar
+            </Text>
+          </TouchableOpacity>
+
+          {/* Botão Esqueceu a senha? */}
+          <TouchableOpacity
+            onPress={handleDemoLogin}
+            style={{ marginTop: 16, alignItems: 'center' }}
+            activeOpacity={0.7}
+          >
+            <Text style={{ color: '#6366f1', fontWeight: 'bold', fontSize: 16 }}>
+              Esqueceu a senha?
+            </Text>
+            <Text style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>
+              Entrar com conta de demonstração
             </Text>
           </TouchableOpacity>
         </View>

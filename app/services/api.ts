@@ -1,6 +1,6 @@
 import { Product } from "@/types/product";
+import axios from "axios";
 
-// Use 10.0.2.2 for Android emulator to access localhost
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const defaultImage = 'https://placehold.co/600x400?text=Produto';
@@ -16,17 +16,17 @@ export const ProductService = {
 
       // Handle image upload
       if (product.image) {
-        // Convert the image object to a File object
-        const response = await fetch(product.image.uri);
-        const blob = await response.blob();
-        const file = new File([blob], product.image.name, { type: product.image.type });
-        formData.append('image', file);
+        formData.append('image', {
+          uri: product.image.uri,
+          name: product.image.name,
+          type: product.image.type,
+        } as any);
       } else {
-        // If no image, fetch the default image and convert to File
-        const response = await fetch(defaultImage);
-        const blob = await response.blob();
-        const file = new File([blob], 'default.jpg', { type: 'image/jpeg' });
-        formData.append('image', file);
+        formData.append('image', {
+          uri: defaultImage,
+          name: 'default.jpg',
+          type: 'image/jpeg',
+        } as any);
       }
 
       console.log('Sending request to:', `${API_URL}/produtos`);
@@ -38,26 +38,19 @@ export const ProductService = {
         image: product.image ? 'File object' : 'Default image file'
       });
 
-      const response = await fetch(`${API_URL}/produtos`, {
-        method: 'POST',
-        body: formData,
+      const response = await axios.post(`${API_URL}/produtos`, formData, {
         headers: {
           'Accept': 'application/json',
         },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error(`Failed to create product: ${errorText}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       return {
         ...data,
         imageUrl: data.image_url ?? defaultImage,
       };
     } catch (error) {
+      console.log('Error:', error);
       console.error('Create product error:', error);
       throw error;
     }
@@ -65,11 +58,8 @@ export const ProductService = {
 
   async getById(id: string): Promise<Product> {
     try {
-      const response = await fetch(`${API_URL}/produtos/${id}`);
-      if (!response.ok) {
-        throw new Error('Product not found');
-      }
-      const data = await response.json();
+      const response = await axios.get(`${API_URL}/produtos/${id}`);
+      const data = response.data;
       return {
         id: data.id,
         name: data.name,
@@ -87,13 +77,8 @@ export const ProductService = {
   async getAll(): Promise<Product[]> {
     try {
       console.log('Fetching products from:', `${API_URL}/produtos`);
-      const response = await fetch(`${API_URL}/produtos`);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error('Failed to fetch products');
-      }
-      const data = await response.json();
+      const response = await axios.get(`${API_URL}/produtos`);
+      const data = response.data;
       return data.map((item: any) => ({
         id: item.id,
         name: item.name,
@@ -109,20 +94,16 @@ export const ProductService = {
   },
 
   async update(id: string, product: Partial<Product>): Promise<void> {
-    await fetch(`${API_URL}/produtos/${id}`, {
-      method: 'PUT',
+    await axios.put(`${API_URL}/produtos/${id}`, product, {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(product),
     });
   },
 
   async delete(id: string): Promise<void> {
     try {
-      const response = await fetch(`${API_URL}/produtos/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
+      const response = await axios.delete(`${API_URL}/produtos/${id}`);
+      if (response.status !== 204) {
+        const errorText = response.data;
         console.error('API Error:', errorText);
         throw new Error('Failed to delete product');
       }
